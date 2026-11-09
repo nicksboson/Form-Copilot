@@ -1,41 +1,72 @@
+<div align="center">
+
 # Form Copilot
 
-Form Copilot is a Chrome Extension (Manifest V3) and local AI service that reads Google Forms top-to-bottom, builds a structured snapshot, generates summaries in multiple languages, and provides a realtime multilingual voice and text assistant. It enables users to converse naturally in their preferred language (English, Hindi, Bengali, Tamil, Telugu, Kannada, Gujarati, Marathi), understand complex form requirements, and safely autofill fields on the active Google Form with explicit user confirmation.
+### Realtime Multilingual AI & Voice Assistant for Google Forms
+
+[![Manifest V3](https://img.shields.io/badge/Chrome_Extension-Manifest_V3-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/mv3/intro/)
+[![React 18](https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Groq LLM](https://img.shields.io/badge/Groq-gpt--oss--120b-F55036)](https://console.groq.com)
+[![Gnani Voice AI](https://img.shields.io/badge/Gnani-Prisma_%26_Timbre-7C3AED)](https://docs.gnani.ai)
+[![Node.js](https://img.shields.io/badge/Backend-Node.js_20+-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![Vitest](https://img.shields.io/badge/Unit_Tests-Vitest_Passing-729B1B?logo=vitest&logoColor=white)](https://vitest.dev)
+[![Playwright](https://img.shields.io/badge/E2E_Tests-Playwright_Passing-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev)
+
+<p align="center">
+  Form Copilot transforms how users interact with Google Forms by delivering intelligent top-to-bottom form parsing, instant multilingual summarization, hands-free voice dialogue in native Indian languages, and safe, user-confirmed autofill directly into Google Forms.
+</p>
+
+<p align="center">
+  <a href="#overview">Overview</a> &bull;
+  <a href="#architecture">Architecture</a> &bull;
+  <a href="#core-capabilities">Capabilities</a> &bull;
+  <a href="#api-keys--security">API Keys & Security</a> &bull;
+  <a href="#multilingual-matrix">Languages</a> &bull;
+  <a href="#project-structure">Project Structure</a> &bull;
+  <a href="#quick-start">Quick Start</a> &bull;
+  <a href="#testing">Testing</a>
+</p>
+
+</div>
 
 ---
 
-## Key Highlights
+## Overview
 
-- **Dual-Mode Form Parsing**: Extracts complete form structures directly from embedded page runtime scripts (`FB_PUBLIC_LOAD_DATA_`) with fallback to intelligent viewport DOM scanning.
-- **Realtime Multilingual Voice Assistant**: Converse naturally with voice in and voice out powered by Gnani Prisma STT and Gnani Timbre TTS.
-- **Intelligent Form Reasoning**: Powered by Groq's high-speed inference engine (`openai/gpt-oss-120b`) for form summarization, context-aware Q&A, and candidate answer generation.
-- **Safe Closure/Wiz DOM Automation**: Accurately targets Google Forms internal DOM components, simulates native user typing and selection events, and prevents overwriting existing responses.
-- **Strict User Control & Safety**: Never clicks Submit, Next, or Back automatically; requires explicit confirmation before filling any form control.
-- **Glassmorphic Apple-Inspired Interface**: Clean, translucent sidepanel design with localized UI controls, live voice waveform animations, and realtime API configuration status checks.
+Filling long or complex Google Forms can be intimidating, especially when navigating unfamiliar technical phrasing or completing forms in a non-native language. Form Copilot runs natively as a Chrome Side Panel alongside Google Forms (`https://docs.google.com/forms/*`) to provide:
+
+1. **Automated Structure Extraction**: Instant form analysis via embedded data parsing (`FB_PUBLIC_LOAD_DATA_`) or fallback viewport DOM scrolling.
+2. **Context-Aware Summaries**: Understand form goals, section branches, required inputs, and estimated time to complete.
+3. **Conversational Assistant**: Ask questions in real time via text or speech (English, Hindi, Bengali, Tamil, Telugu, Kannada, Gujarati, Marathi).
+4. **Interactive Voice Form Filling**: Step through questions conversationally with voice input and voice playback, reviewing suggested answers before they are applied.
+5. **Safe Event-Driven Automation**: Accurately triggers Google Forms' internal Closure/Wiz state machines without overwriting existing data or submitting forms automatically.
 
 ---
 
-## System Architecture
+## Architecture
+
+Form Copilot separates duties across browser client contexts, a local Node.js proxy service, and cloud inference APIs to guarantee security and zero key leakage:
 
 ```mermaid
 flowchart TD
     subgraph Browser["Google Chrome (Active Tab & Extension)"]
-        FormTab["Google Form Active Tab<br/>(docs.google.com/forms/*)"]
-        ContentScript["Content Script<br/>(reader.ts, embedded.ts, filler.ts)"]
-        BackgroundWorker["Service Worker<br/>(background/index.ts)"]
-        SidepanelUI["React Sidepanel UI<br/>(App.tsx, ChatView, VoiceSimulation, SettingsModal)"]
+        FormTab["Google Form Active Tab<br/>docs.google.com/forms/*"]
+        ContentScript["Content Scripts<br/>reader.ts | embedded.ts | filler.ts"]
+        BackgroundWorker["Extension Service Worker<br/>background/index.ts"]
+        SidepanelUI["React Side Panel UI<br/>App.tsx | ChatView | VoiceSimulation"]
 
         FormTab <-->|"DOM Inspection & Event Dispatch"| ContentScript
         ContentScript <-->|"Chrome Runtime Messages"| BackgroundWorker
         BackgroundWorker <-->|"Port & Event Relays"| SidepanelUI
     end
 
-    subgraph LocalBackend["Local Backend Server (Node.js 20+ Express)"]
-        ExpressApp["Express API Server<br/>(http://localhost:3001)"]
-        HealthRoute["/api/health<br/>(Status & Key Verification)"]
-        LLMRoute["/api/llm<br/>(Summary & Conversation)"]
-        STTRoute["/api/stt<br/>(Audio Transcription)"]
-        TTSRoute["/api/tts<br/>(Speech Synthesis)"]
+    subgraph LocalBackend["Local Backend Server (Node.js Express :3001)"]
+        ExpressApp["Express API Server<br/>http://localhost:3001"]
+        HealthRoute["/api/health<br/>Status & Key Verification"]
+        LLMRoute["/api/llm<br/>Summary & Conversation Engine"]
+        STTRoute["/api/stt<br/>Prisma Audio Transcription"]
+        TTSRoute["/api/tts<br/>Timbre Speech Synthesis"]
 
         ExpressApp --> HealthRoute
         ExpressApp --> LLMRoute
@@ -43,10 +74,10 @@ flowchart TD
         ExpressApp --> TTSRoute
     end
 
-    subgraph ExternalAPIs["Cloud AI Providers"]
-        GroqAPI["Groq Cloud API<br/>(openai/gpt-oss-120b)"]
-        GnaniSTT["Gnani Prisma STT API<br/>(Speech-to-Text)"]
-        GnaniTTS["Gnani Timbre TTS API<br/>(Text-to-Speech)"]
+    subgraph CloudAPIs["External AI Providers"]
+        GroqAPI["Groq Cloud API<br/>openai/gpt-oss-120b"]
+        GnaniSTT["Gnani Prisma STT API<br/>Speech-to-Text"]
+        GnaniTTS["Gnani Timbre TTS API<br/>Text-to-Speech"]
 
         LLMRoute -->|"HTTPS Bearer Auth"| GroqAPI
         STTRoute -->|"HTTPS X-API-Key-ID"| GnaniSTT
@@ -56,42 +87,85 @@ flowchart TD
     SidepanelUI <-->|"HTTP JSON / Audio Fetch"| ExpressApp
 ```
 
-### Communication Flow
+### Communication Pipeline
 
-1. **Extraction**: The React sidepanel requests a form read. The background worker signals the content script on the active Google Forms tab to inspect the page.
-2. **Snapshot Synthesis**: The content script extracts question titles, types, options, validation rules, and required flags, returning a validated `FormSnapshot` to the sidepanel.
-3. **AI Summarization**: The sidepanel transmits the snapshot to the local backend `/api/llm` endpoint, where Groq compiles a structured overview in the user's chosen language.
-4. **Voice & Text Dialogue**:
-   - Voice audio is recorded in 16 kHz mono WAV via the browser MediaRecorder and dispatched to `/api/stt`.
-   - Gnani Prisma returns high-accuracy transcripts.
-   - Groq processes conversation turns against the form snapshot context.
-   - Responses are spoken back via Gnani Timbre TTS (`/api/tts`).
-5. **Form Automation**: When the user approves an answer or says "move to form filling", the sidepanel sends a typed fill command to the content script, which focuses the element, dispatches synthetic events, and updates the form state.
+| Step | Initiator | Target | Protocol / Payload | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Form Scan** | Sidepanel | Content Script | `SCAN_FORM` message | Background worker relays request; content script extracts question schema. |
+| **2. Snapshot** | Content Script | Sidepanel | `FormSnapshot` JSON | Returns validated snapshot conforming to `FormSnapshotSchema`. |
+| **3. Summarization** | Sidepanel | Backend (`/api/llm/summary`) | HTTP POST JSON | Trims snapshot to token budget; Groq generates structured multi-language overview. |
+| **4. Voice Capture** | Sidepanel | Backend (`/api/stt`) | HTTP POST (16 kHz WAV) | Transcribes microphone speech via Gnani Prisma v3.0 / v2.5. |
+| **5. AI Dialogue** | Sidepanel | Backend (`/api/llm/chat`) | HTTP POST JSON | Groq evaluates user speech against form questions and returns structured guidance. |
+| **6. Voice Output** | Sidepanel | Backend (`/api/tts`) | HTTP POST JSON | Synthesizes response speech using Gnani Timbre v2.5; plays back in sidepanel. |
+| **7. Field Fill** | Sidepanel | Content Script | `FILL_FIELD` message | Simulates user input and native Closure/Wiz events with explicit confirmation. |
 
 ---
 
-## API Keys & Security Architecture
+## Core Capabilities
 
-Form Copilot enforces a strict credential isolation model:
+### 1. Dual-Mode Form Ingestion
+
+Form Copilot adapts dynamically to form size, complexity, and rendering method:
 
 ```mermaid
 flowchart LR
-    Client["Extension Sidepanel<br/>(No Keys Bundled)"]
-    Settings["Settings Modal<br/>(Backend URL Config)"]
-    Backend["Local Express Backend<br/>(Loads .env)"]
-    EnvFile[".env<br/>(Protected Secrets)"]
-    Groq["Groq Cloud API"]
-    Gnani["Gnani Voice API"]
-
-    Settings -->|"Test Connection GET /api/health"| Backend
-    Backend -->|"Checks presence"| EnvFile
-    Client -->|"Proxied API Calls"| Backend
-    Backend -->|"API Key Header"| Groq
-    Backend -->|"API Key Header"| Gnani
+    Start["Initiate Scan"] --> CheckScript{"Contains FB_PUBLIC_LOAD_DATA_?"}
+    CheckScript -- Yes --> ModeFull["FULL Mode<br/>Extract embedded JSON script<br/>Instantaneous & multi-page"]
+    CheckScript -- No --> ModePartial["PARTIAL Mode<br/>Smooth viewport scroll scan<br/>Progressive page capture"]
+    ModeFull --> Validate["Zod Schema Validation"]
+    ModePartial --> Validate
+    Validate --> Ready["Snapshot Ready"]
 ```
 
-### 1. Backend Configuration (.env)
-All API credentials reside exclusively on the local Node.js backend inside `.env` at the repository root. Keys are never embedded into frontend assets, manifest files, git history, or client network requests.
+- **FULL Mode (Embedded Parsing)**: Parses Google Forms' internal `FB_PUBLIC_LOAD_DATA_` payload directly from script tags. Instantly uncovers all questions across all pages, branching conditions, validation patterns, and choices before the user navigates.
+- **PARTIAL Mode (DOM Scan Fallback)**: If scripts are stripped or modified, controlled viewport stepping scans visible sections in 80% viewport increments, capping at 200 cycles with automatic scroll restoration and visual progress feedback.
+
+### 2. Event-Accurate Form Automation
+
+Google Forms uses custom web components that ignore primitive DOM property assignments. Form Copilot's `filler.ts` dispatches native synthetic events matching the internal state machines:
+
+- **Text Inputs & Textareas**: Sets native value descriptors followed by sequential `keydown`, `input`, `change`, and `blur` events.
+- **Radio Buttons**: Resolves candidate radio options by value index or label text and triggers native click and change handlers.
+- **Checkboxes**: Evaluates desired states and checks boxes without unselecting prior entries.
+- **Dropdown Lists**: Interacts with `[role="listbox"]` containers to select appropriate option rows.
+- **Security-Restricted Fields**: Dates, times, and file uploads prompt user manual completion in their native language rather than risking malformed inputs.
+- **Overwrite Protection**: Form Copilot checks existing values and will never overwrite user-entered fields without explicit instruction.
+
+### 3. Apple-Inspired Glassmorphic UI
+
+The sidepanel is designed with a modern, distraction-free aesthetic:
+
+- **Translucent Frosted Panels**: Layered backdrop blur (`backdrop-filter: blur(12px)`), subtle borders, and smooth shadows.
+- **Pulsing Audio Radar**: Live dynamic waveform animation indicating when the assistant is listening, thinking, or speaking.
+- **Integrated Health Inspector**: A dedicated Settings modal that lets users verify backend connectivity and test Groq and Gnani key readiness in real time.
+- **Live Diagnostics**: Inspect raw snapshots, detected scan mode, warning logs, and question element targets.
+
+---
+
+## API Keys & Security
+
+Form Copilot maintains a zero-trust credential model.
+
+> [!IMPORTANT]
+> API keys are never bundled into extension files, manifests, content scripts, or network calls from the browser. All third-party AI requests are proxied securely through the local backend.
+
+```mermaid
+flowchart LR
+    Extension["Chrome Extension<br/>(Side Panel)"]
+    LocalBackend["Express Backend<br/>(localhost:3001)"]
+    EnvFile[".env File<br/>(Root Directory)"]
+    ExternalGroq["Groq Cloud"]
+    ExternalGnani["Gnani AI"]
+
+    Extension -->|"HTTP (No Keys)"| LocalBackend
+    LocalBackend -->|"Reads at Boot"| EnvFile
+    LocalBackend -->|"Bearer Key"| ExternalGroq
+    LocalBackend -->|"X-API-Key-ID"| ExternalGnani
+```
+
+### Backend `.env` Specification
+
+Create a `.env` file in the project root:
 
 ```env
 # Server Port (default: 3001)
@@ -112,158 +186,113 @@ GNANI_API=your_gnani_api_key_here
 ALLOWED_ORIGIN=chrome-extension://*
 ```
 
-> [!IMPORTANT]
-> The backend automatically accepts both `GROQ_API_KEY` / `GROQ_API` and `GNANI_API_KEY` / `GNANI_API` syntax. A sanitized `.env.example` is provided in the repository root and `backend/` directory.
+### Health Verification Endpoint
 
-### 2. Frontend Configuration & Health Verification
-The extension sidepanel communicates with the backend over a configurable URL (default: `http://localhost:3001`).
+The backend provides a safe health inspection route:
 
-- **Settings Modal**: Accessible from the sidepanel header, allowing users to configure the backend server endpoint.
-- **Test Connection & API Status**: Clicking **Test Connection** in the Settings modal issues a probe to `/api/health`. The backend returns the live connectivity status and key presence flags (`configured: { groq: boolean, gnani: boolean }`) without disclosing the underlying secrets.
-- **Live Status Badges**: Displays instantaneous green/amber feedback indicating whether the backend daemon is online and whether Groq and Gnani keys are active.
-
----
-
-## Form Ingestion Modes
-
-```mermaid
-flowchart LR
-    Start["Initiate Form Scan"] --> CheckScript{"Contains FB_PUBLIC_LOAD_DATA_?"}
-    CheckScript -- Yes --> ModeFull["FULL Mode<br/>Parse embedded JSON script"]
-    CheckScript -- No --> ModePartial["PARTIAL Mode<br/>Viewport DOM scroll scan"]
-    ModeFull --> Validate["Zod FormSnapshot Validation"]
-    ModePartial --> Validate
-    Validate --> Ready["Snapshot Ready for Assistant"]
+```http
+GET /api/health
 ```
 
-### 1. FULL Mode (Embedded Script Parsing)
-Google Forms embeds its complete form schema within an inline `<script>` tag containing the variable `FB_PUBLIC_LOAD_DATA_`. 
-- **Mechanism**: The content script locates and extracts this array structure, resolving questions across all pages, item IDs, types, validation rules, and branching logic even before the user navigates past page one.
-- **Efficiency**: Instantaneous capture without requiring viewport scrolling or simulated interaction.
+**Example Response**:
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-11-10T04:39:15.908Z",
+  "service": "Form Copilot Backend",
+  "configured": {
+    "groq": true,
+    "gnani": true
+  }
+}
+```
 
-### 2. PARTIAL Mode (Visible DOM Scanning Fallback)
-If the embedded data blob is omitted, obfuscated, or rendered dynamically:
-- **Mechanism**: The content script activates `dom-scan.ts` and `scroll.ts`, performing controlled downward viewport scrolls in increments of 80% viewport height.
-- **Safety Caps**: Monitored with a maximum limit of 200 scroll steps and stopping when the document height remains stable across 3 consecutive frames.
-- **Restoration**: The original scroll position is saved and seamlessly restored upon completion.
-
----
-
-## Form Filling Automation Engine
-
-Google Forms employs the Google Wiz and Closure component frameworks. Simple property mutations (such as `input.value = "text"`) do not trigger internal form model updates. Form Copilot's `filler.ts` implements compliant synthetic event dispatching:
-
-- **Text & Paragraph Fields**: Focuses the target `input` or `textarea`, sets the native value property descriptor, and dispatches sequential `keydown`, `input`, `change`, and `blur` events.
-- **Radio & Multiple Choice Options**: Locates the matching `[role="radio"]` element by label text or value index, clicks the target element, and triggers `change` events.
-- **Checkboxes**: Evaluates desired states and selectively dispatches click events to `[role="checkbox"]` elements without deselecting prior valid selections.
-- **Dropdowns & Select Menus**: Interacts with `[role="listbox"]` containers, selecting candidate option rows.
-- **Specialized Fields (Dates, Times, File Uploads)**: When direct automation is restricted by browser security policies (such as OS file dialogs), the assistant highlights the question and guides the user via voice or on-screen prompt to complete the selection manually.
-- **Overwrite Protection**: Form Copilot verifies existing control values. If a field already contains user input, the assistant will not overwrite it without confirmation.
+The extension Settings modal uses this endpoint to display live status badges (**Online / Offline**, **Configured / Missing**) without exposing keys.
 
 ---
 
-## Multilingual Support
+## Multilingual Matrix
 
-Form Copilot provides end-to-end language continuity across both UI text and voice conversation:
+Form Copilot features unified language locking: changing the language dropdown updates UI text, Groq conversational instructions, and Gnani STT/TTS engine dialects simultaneously:
 
-| Language | Locale Code | Gnani STT Code | Gnani TTS Lang Code |
-| :--- | :--- | :--- | :--- |
-| **English** | `en` | `en-IN` | `en` |
-| **Hindi** | `hi` | `hi` | `hi` |
-| **Bengali** | `bn` | `bn` | `bn` |
-| **Tamil** | `ta` | `ta` | `ta` |
-| **Telugu** | `te` | `te` | `te` |
-| **Kannada** | `kn` | `kn` | `kn` |
-| **Gujarati** | `gu` | `gu` | `gu` |
-| **Marathi** | `mr` | `mr` | `mr` |
-
-> [!NOTE]
-> When a user selects a language from the dropdown, the selection locks both Groq system prompts and Gnani STT/TTS models to that language, preventing unintended code-switching.
+| Language | Locale Code | Gnani STT Dialect | Gnani TTS Code | UI Localization |
+| :--- | :--- | :--- | :--- | :--- |
+| **English** | `en` | `en-IN` | `en` | Full English UI |
+| **Hindi** | `hi` | `hi` | `hi` | Full Hindi UI |
+| **Bengali** | `bn` | `bn` | `bn` | Localized Prompts |
+| **Tamil** | `ta` | `ta` | `ta` | Localized Prompts |
+| **Telugu** | `te` | `te` | `te` | Localized Prompts |
+| **Kannada** | `kn` | `kn` | `kn` | Localized Prompts |
+| **Gujarati** | `gu` | `gu` | `gu` | Localized Prompts |
+| **Marathi** | `mr` | `mr` | `mr` | Localized Prompts |
 
 ---
 
-## Project Scopes and Boundaries
-
-### In Scope
-- Google Forms public and authenticated view URLs (`https://docs.google.com/forms/*`).
-- Reading single-page and multi-page forms.
-- Structured summarization (purpose, required questions, estimated completion time).
-- Multilingual voice conversation and step-by-step form filling.
-- Single-field and multi-field autofill with user confirmation.
-
-### Out of Scope (Strict Hard Rules)
-- **No Automated Form Submission**: Form Copilot strictly forbids clicking `Submit`, `Next`, or `Back` buttons. Navigation and final submission remain under user control.
-- **No Non-Google Form Sites**: The extension will not execute on generic web pages or non-Google form builders.
-- **No Direct Third-Party API Calls from Extension**: The extension communicates exclusively with its local backend server. Groq and Gnani API credentials reside solely in the backend environment.
-- **No Untracked Data Storage**: Form snapshots remain in memory and are discarded upon tab close or reset. `chrome.storage.local` is restricted to user configuration settings.
-
----
-
-## Repository Structure
+## Project Structure
 
 ```
 VoiceForm/
-├── .env                              # Local active credentials (Git ignored)
+├── .env                              # Active environment credentials (git-ignored)
 ├── .env.example                      # Template for environment configuration
-├── .gitignore                        # Git ignore specifications
-├── agent.md                          # Architectural rules and boundary invariants
-├── package.json                      # Monorepo root workspace configuration
-├── package-lock.json                 # Pinned dependencies lockfile
-├── playwright.config.ts              # Playwright end-to-end testing configuration
-├── vitest.config.ts                  # Vitest unit testing configuration
+├── .gitignore                        # Git exclusion rules
+├── agent.md                          # Architectural invariants and boundary rules
+├── package.json                      # Monorepo root workspaces configuration
+├── package-lock.json                 # Dependency lockfile
+├── playwright.config.ts              # Playwright test configuration
+├── vitest.config.ts                  # Vitest test configuration
 ├── README.md                         # Project documentation
 │
 ├── backend/                          # Local Node.js Express API service
-│   ├── .env.example                  # Backend-specific environment template
+│   ├── .env.example                  # Backend template for environment settings
 │   ├── package.json                  # Backend dependencies and scripts
-│   ├── tsconfig.json                 # Backend TypeScript compiler settings
+│   ├── tsconfig.json                 # TypeScript compiler configuration
 │   └── src/
-│       ├── server.ts                 # Express initialization, CORS, and /api/health
+│       ├── server.ts                 # Server startup, CORS, and /api/health
 │       ├── lib/
-│       │   ├── gnani.ts              # Gnani Prisma v3/v2.5 STT & Timbre v2.5 TTS client
+│       │   ├── gnani.ts              # Gnani Prisma STT & Timbre TTS client
 │       │   └── groq.ts               # Groq LLM client with token management
 │       └── routes/
-│           ├── llm.ts                # /api/llm/summary & /api/llm/chat endpoints
-│           ├── stt.ts                # /api/stt audio transcription endpoint
-│           └── tts.ts                # /api/tts speech synthesis endpoint
+│           ├── llm.ts                # Form summarization and chat endpoints
+│           ├── stt.ts                # Audio transcription endpoint
+│           └── tts.ts                # Speech synthesis endpoint
 │
 ├── extension/                        # Chrome Manifest V3 Extension
-│   ├── manifest.config.ts            # Manifest V3 specification
+│   ├── manifest.config.ts            # Manifest V3 configuration
 │   ├── package.json                  # Extension dependencies and scripts
 │   ├── tsconfig.json                 # Extension TypeScript compiler settings
 │   ├── vite.config.ts                # Vite + CRXJS packaging pipeline
-│   ├── tailwind.config.js            # Glassmorphic Tailwind styling theme
-│   ├── postcss.config.js             # PostCSS plugin pipeline
+│   ├── tailwind.config.js            # Glassmorphic Tailwind styling
+│   ├── postcss.config.js             # PostCSS build pipeline
 │   ├── permission.html               # Audio permission request document
 │   └── src/
-│       ├── permission.ts             # Microphone permission trigger script
+│       ├── permission.ts             # Microphone access handler
 │       ├── background/
-│       │   └── index.ts              # Extension service worker (sidepanel & tab relay)
+│       │   └── index.ts              # Background service worker (sidepanel relay)
 │       ├── content/
 │       │   ├── index.ts              # Content script runtime entrypoint
-│       │   ├── reader.ts             # Form reading coordinator
-│       │   ├── embedded.ts           # FB_PUBLIC_LOAD_DATA_ script extractor (FULL mode)
-│       │   ├── dom-scan.ts           # Viewport DOM scanner (PARTIAL mode fallback)
-│       │   ├── filler.ts             # Closure/Wiz event simulator & form filler
-│       │   ├── scroll.ts             # Controlled viewport step-scroller
-│       │   ├── overlay.ts            # Visual scanning progress indicator
-│       │   └── selectors.ts          # Centralized Google Forms DOM selectors
+│       │   ├── reader.ts             # Reader orchestrator (FULL & PARTIAL modes)
+│       │   ├── embedded.ts           # FB_PUBLIC_LOAD_DATA_ script extractor
+│       │   ├── dom-scan.ts           # Fallback visible DOM scanner
+│       │   ├── filler.ts             # Closure/Wiz event simulator
+│       │   ├── scroll.ts             # Smooth viewport scrolling utility
+│       │   ├── overlay.ts            # Scanning progress indicator
+│       │   └── selectors.ts          # Central Google Forms DOM selectors
 │       ├── settings/
-│       │   └── index.ts              # Backend URL storage & health check helper
+│       │   └── index.ts              # Backend URL persistence & health client
 │       └── sidepanel/
-│           ├── App.tsx               # Root sidepanel state engine and UI shell
+│           ├── App.tsx               # Root application state machine & UI shell
 │           ├── index.tsx             # React mount entrypoint
 │           ├── index.html            # Sidepanel host HTML document
 │           ├── index.css             # Glassmorphic styles and custom scrollbars
-│           ├── i18n.ts               # Multilingual dictionary for UI strings
-│           ├── languages.ts          # Language metadata and dialect definitions
-│           ├── useVoiceSimulation.ts # Realtime voice conversational state machine
-│           ├── wav-recorder.ts       # 16 kHz mono WAV audio recorder
+│           ├── i18n.ts               # Multilingual translations dictionary
+│           ├── languages.ts          # Language catalog and dialect configurations
+│           ├── useVoiceSimulation.ts # Realtime voice conversational state hook
+│           ├── wav-recorder.ts       # 16 kHz mono WAV audio recording
 │           └── components/
 │               ├── ChatView.tsx      # Realtime conversation interface
 │               ├── VoiceFillingSimulation.tsx # Voice assistant card with radar aura
 │               ├── SummaryCard.tsx   # Form overview and statistics card
-│               ├── QuestionNav.tsx   # Step-by-step question navigation list
+│               ├── QuestionNav.tsx   # Step-by-step question list
 │               ├── LanguageSelector.tsx # Multilingual dropdown selector
 │               ├── SettingsModal.tsx # Backend URL config & live API health tester
 │               ├── DiagnosticsModal.tsx # Form snapshot and selector inspector
@@ -287,46 +316,11 @@ VoiceForm/
         └── fixtures.spec.ts          # 6 browser acceptance tests
 ```
 
-### Module Responsibilities
-
-| Module | Purpose |
-| :--- | :--- |
-| **`backend`** | Manages external AI provider communication (Groq and Gnani), keeps API keys secure, and handles audio encoding/decoding. |
-| **`extension/background`** | Service worker that activates the Chrome sidepanel on form tabs and relays cross-context runtime messages. |
-| **`extension/content`** | Executes directly inside the active Google Form tab to extract DOM data and simulate native keyboard and click events. |
-| **`extension/sidepanel`** | React 18 frontend providing the glassmorphic user interface, chat dialogue, voice recording, and control settings. |
-| **`shared`** | Houses shared Zod validation schemas and TypeScript message interfaces used by both the backend and extension. |
-| **`tests`** | Unit and end-to-end test suites executing against offline Google Form fixtures without requiring live network access. |
-
 ---
 
-## Git Ignore Configuration
+## Quick Start
 
-The project's `.gitignore` protects credentials and keeps the repository clean:
-
-- **Environment Secrets**: Blocks `.env`, `.env.*`, and cryptographic certificates (`*.pem`, `*.key`) while allowing `.env.example`.
-- **Build Artifacts**: Excludes `dist/`, `build/`, `out/`, and `*.tsbuildinfo` compiler output.
-- **Test Artifacts**: Ignores `coverage/`, `playwright-report/`, and `test-results/`.
-- **Runtime Audio**: Excludes temporary audio recordings (`*.wav`, `*.mp3`, `*.webm`).
-- **Dependencies & Caches**: Excludes `node_modules/`, `.cache/`, and `.vite/`.
-- **Editor & OS Metadata**: Ignores `.DS_Store`, `Thumbs.db`, `.vscode/`, and `.idea/`.
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- **Node.js**: Version 20.0.0 or higher
-- **npm**: Version 10.0.0 or higher
-- **Google Chrome**: Version 116 or higher (with Side Panel API support)
-- **API Keys**:
-  - [Groq API Key](https://console.groq.com)
-  - [Gnani API Key](https://docs.gnani.ai)
-
-### 1. Installation
-
-Clone the repository and install dependencies across all workspace packages:
+### 1. Clone & Install
 
 ```bash
 git clone https://github.com/your-repo/VoiceForm.git
@@ -334,101 +328,81 @@ cd VoiceForm
 npm install
 ```
 
-### 2. Environment Configuration
+### 2. Configure Environment
 
-Create a `.env` file in the project root:
-
-```env
-PORT=3001
-GROQ_API_KEY=your_groq_api_key_here
-GNANI_API_KEY=your_gnani_api_key_here
-GROQ_MODEL=openai/gpt-oss-120b
-```
-
-> [!IMPORTANT]
-> Never commit your `.env` file or expose your API keys in frontend extension builds.
-
-### 3. Build Packages
-
-Compile the shared schema module and the Chrome extension:
+Copy `.env.example` to `.env` and insert your API keys:
 
 ```bash
-# Build shared library
+cp .env.example .env
+```
+
+Edit `.env`:
+```env
+PORT=3001
+GROQ_API_KEY=gsk_your_groq_api_key
+GNANI_API_KEY=vach_your_gnani_api_key
+```
+
+### 3. Build Workspaces
+
+```bash
+# Build shared library schemas
 npm --workspace=shared run build
 
-# Build Chrome extension
+# Build Chrome Extension
 npm --workspace=extension run build
 
-# Build backend
+# Build Backend Server
 npm --workspace=backend run build
 ```
 
-### 4. Start the Local Backend Server
+### 4. Start Local Backend
 
 ```bash
 npm --workspace=backend run start
 ```
+*Server starts on `http://localhost:3001`.*
 
-The service will start on `http://localhost:3001` with endpoints ready:
-- `GET  /api/health`
-- `POST /api/llm/summary`
-- `POST /api/llm/chat`
-- `POST /api/stt`
-- `POST /api/tts`
+### 5. Load in Chrome
 
-### 5. Load the Extension in Google Chrome
-
-1. Open Google Chrome and navigate to `chrome://extensions/`.
-2. Enable **Developer mode** using the toggle switch in the top right.
-3. Click **Load unpacked**.
-4. Select the build directory: `VoiceForm/extension/dist`.
-5. Open any Google Form (for example, `https://docs.google.com/forms/d/e/.../viewform`).
-6. Click the **Form Copilot** extension icon in your browser toolbar to open the sidepanel.
+1. Navigate to `chrome://extensions/` in Google Chrome.
+2. Toggle on **Developer mode** in the upper right.
+3. Click **Load unpacked** and select `VoiceForm/extension/dist`.
+4. Open any Google Form (`docs.google.com/forms/*`).
+5. Click the **Form Copilot** extension icon to open the sidepanel.
 
 ---
 
-## Usage Guide
+## Scopes & Invariants
 
-1. **Select Language**: Choose your desired communication language (e.g. English, Hindi, Tamil) from the dropdown.
-2. **Review Form Summary**: Inspect the high-level overview detailing form objectives, question counts, and required items.
-3. **Verify API Status**: Open **Settings** from the header and click **Test Connection** to confirm backend connectivity and active API key status.
-4. **Interactive Text Chat**: Type queries regarding question meanings, phrasing recommendations, or required documents.
-5. **Voice Filling Mode**:
-   - Click **Start Voice** (or grant microphone access via the permission prompt).
-   - The assistant introduces itself in the chosen language.
-   - Speak your response naturally.
-   - For open-ended questions, review generated suggestions.
-   - Confirm candidate responses before they are populated on the active Google Form tab.
-6. **Form Diagnostics**: Access the **Diagnostics** panel from the header to inspect the raw `FormSnapshot`, execution mode (`FULL` or `PARTIAL`), and question selectors.
+| Rule | Enforcement |
+| :--- | :--- |
+| **Scope Boundary** | Operates strictly on `https://docs.google.com/forms/*`. Ignored on all other URLs. |
+| **No Auto-Submit** | Never clicks `Submit`, `Next`, or `Back` in reader mode. Form submission remains entirely user-controlled. |
+| **No Silent Overwrites** | Pre-existing input values are never overwritten without explicit user confirmation. |
+| **Confirmation Required** | Form filling actions require explicit user approval via sidepanel button or voice confirmation. |
+| **Zero Extension Secrets** | Extension bundle and network traffic contain zero API keys. All calls proxy through the local backend. |
+| **Clean Design Standards** | Translucent Apple-style glassmorphism with zero emojis in code, UI, or markdown documents. |
 
 ---
 
-## Testing and Verification
+## Testing
 
-Form Copilot includes comprehensive unit and integration suites verifying schema integrity, embedded script extraction, and end-to-end form interaction.
-
-### Run Unit Tests (Vitest)
+Form Copilot includes automated unit and end-to-end test suites run against offline Google Form fixtures:
 
 ```bash
+# Run Vitest unit tests (schema validation & embedded parser)
 npm run test
-```
 
-Verifies Zod schema validation rules, snapshot boundary parsing, and script extraction logic.
-
-### Run End-to-End Tests (Playwright)
-
-```bash
+# Run Playwright acceptance tests (6 automated end-to-end checks)
 npm run test:e2e
 ```
 
-Executes automated browser verification against single-page and multi-page form fixtures in `tests/fixtures/`.
+### Acceptance Checks Covered
 
----
-
-## Security and Compliance
-
-- **No Key Leaks**: All cloud communication is proxied through the local Express daemon. Content scripts and extension bundles never store API keys.
-- **Content Security Policy**: Manifest V3 compliant with zero `eval()`, zero dynamic inline scripts, and sandboxed storage limits.
-- **Non-Destructive Automation**: Field modifications respect current page states without overriding completed questions. Forms cannot be submitted programmatically.
-#   F o r m - C o p i l o t  
- 
+- **Check 1**: Single-page form parsing accurately extracts all questions, types, and required flags.
+- **Check 2**: Multi-page form FULL mode resolves all pages and branching logic.
+- **Check 3**: Multi-page form PARTIAL mode captures visible pages with warnings and allows incremental addition.
+- **Check 4**: Scanning overlay displays during extraction and cleans up reliably in `finally`.
+- **Check 5**: Prevents clicks on Submit, Next, or Back navigation buttons.
+- **Check 6**: Event simulation verifies text entry, radio selection, and overwrite protection.
