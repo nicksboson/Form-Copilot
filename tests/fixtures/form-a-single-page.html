@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Form A - Single Page Customer Survey</title>
+  <style>
+    body { font-family: Roboto, Arial, sans-serif; background: #ede7f6; margin: 0; padding: 20px; }
+    .form-container { max-width: 640px; margin: 0 auto; background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .header { border-top: 10px solid #673ab7; border-radius: 8px 8px 0 0; padding-bottom: 16px; margin-bottom: 20px; }
+    .question-card { border: 1px solid #dadce0; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .question-title { font-size: 16px; font-weight: 500; margin-bottom: 12px; }
+    .required-asterisk { color: #d93025; margin-left: 4px; }
+    input[type="text"], textarea { width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 8px; box-sizing: border-box; }
+    .radio-option, .checkbox-option { display: flex; align-items: center; margin: 8px 0; cursor: pointer; }
+    .button-bar { display: flex; justify-content: space-between; margin-top: 24px; }
+    .btn { background: #673ab7; color: #fff; border: none; border-radius: 4px; padding: 10px 24px; font-size: 14px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <div class="header">
+      <h1 role="heading" aria-level="1">Form A Customer Feedback</h1>
+      <p>Please share your detailed feedback.</p>
+    </div>
+
+    <form role="form">
+      <!-- Q1: Short Text (Required) -->
+      <div role="listitem" class="question-card" data-item-id="q1">
+        <div role="heading" aria-level="2" class="question-title">
+          <span>Full Name</span>
+          <span class="required-asterisk" aria-label="Required question">*</span>
+        </div>
+        <div class="input-container">
+          <input type="text" name="entry.100000001" aria-label="Full Name" required />
+        </div>
+      </div>
+
+      <!-- Q2: Paragraph (Required) -->
+      <div role="listitem" class="question-card" data-item-id="q2">
+        <div role="heading" aria-level="2" class="question-title">
+          <span>Detailed Feedback</span>
+          <span class="required-asterisk" aria-label="Required question">*</span>
+        </div>
+        <div class="input-container">
+          <textarea name="entry.100000002" aria-label="Detailed Feedback" rows="3" required></textarea>
+        </div>
+      </div>
+
+      <!-- Q3: Multiple Choice / Radio (Required) -->
+      <div role="listitem" class="question-card" data-item-id="q3">
+        <div role="heading" aria-level="2" class="question-title">
+          <span>Preferred Language</span>
+          <span class="required-asterisk" aria-label="Required question">*</span>
+        </div>
+        <div role="radiogroup" aria-label="Preferred Language">
+          <div role="radio" aria-checked="false" tabindex="0" class="radio-option" data-value="Hindi">
+            <span class="option-label">Hindi</span>
+          </div>
+          <div role="radio" aria-checked="false" tabindex="-1" class="radio-option" data-value="English">
+            <span class="option-label">English</span>
+          </div>
+          <div role="radio" aria-checked="false" tabindex="-1" class="radio-option" data-value="Hinglish">
+            <span class="option-label">Hinglish</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4: Checkboxes (Required) -->
+      <div role="listitem" class="question-card" data-item-id="q4">
+        <div role="heading" aria-level="2" class="question-title">
+          <span>Skills</span>
+          <span class="required-asterisk" aria-label="Required question">*</span>
+        </div>
+        <div role="group" aria-label="Skills">
+          <div role="checkbox" aria-checked="false" tabindex="0" class="checkbox-option" data-value="JavaScript">
+            <span class="option-label">JavaScript</span>
+          </div>
+          <div role="checkbox" aria-checked="false" tabindex="0" class="checkbox-option" data-value="Python">
+            <span class="option-label">Python</span>
+          </div>
+          <div role="checkbox" aria-checked="false" tabindex="0" class="checkbox-option" data-value="React">
+            <span class="option-label">React</span>
+          </div>
+          <div role="checkbox" aria-checked="false" tabindex="0" class="checkbox-option" data-value="Node.js">
+            <span class="option-label">Node.js</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5: Dropdown (Required) -->
+      <div role="listitem" class="question-card" data-item-id="q5">
+        <div role="heading" aria-level="2" class="question-title">
+          <span>Experience Level</span>
+          <span class="required-asterisk" aria-label="Required question">*</span>
+        </div>
+        <div role="listbox" aria-label="Experience Level" aria-expanded="false" tabindex="0" class="dropdown-container">
+          <div class="dropdown-selected">Choose</div>
+          <div class="dropdown-options" style="display:none;">
+            <div role="option" aria-selected="false" data-value="Beginner">Beginner</div>
+            <div role="option" aria-selected="false" data-value="Intermediate">Intermediate</div>
+            <div role="option" aria-selected="false" data-value="Advanced">Advanced</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q6: Linear Scale (Optional) -->
+      <div role="listitem" class="question-card" data-item-id="q6">
+        <div role="heading" aria-level="2" class="question-title">
+          <span>Rating</span>
+        </div>
+        <div role="radiogroup" aria-label="Rating">
+          <div role="radio" aria-checked="false" tabindex="0" class="radio-option" data-value="1"><span>1</span></div>
+          <div role="radio" aria-checked="false" tabindex="-1" class="radio-option" data-value="2"><span>2</span></div>
+          <div role="radio" aria-checked="false" tabindex="-1" class="radio-option" data-value="3"><span>3</span></div>
+          <div role="radio" aria-checked="false" tabindex="-1" class="radio-option" data-value="4"><span>4</span></div>
+          <div role="radio" aria-checked="false" tabindex="-1" class="radio-option" data-value="5"><span>5</span></div>
+        </div>
+      </div>
+
+      <!-- Q7: Date (Optional) -->
+      <div role="listitem" class="question-card" data-item-id="q7">
+        <div role="heading" aria-level="2" class="question-title">
+          <span>Date of Birth</span>
+        </div>
+        <div class="input-container">
+          <input type="date" name="entry.100000007" aria-label="Date of Birth" />
+        </div>
+      </div>
+
+      <!-- Q8: Time (Optional) -->
+      <div role="listitem" class="question-card" data-item-id="q8">
+        <div role="heading" aria-level="2" class="question-title">
+          <span>Available Time</span>
+        </div>
+        <div class="input-container">
+          <input type="time" name="entry.100000008" aria-label="Available Time" />
+        </div>
+      </div>
+
+      <!-- Q9: File Upload (Optional) -->
+      <div role="listitem" class="question-card" data-item-id="q9">
+        <div role="heading" aria-level="2" class="question-title">
+          <span>Resume Upload</span>
+        </div>
+        <div class="input-container">
+          <input type="file" aria-label="Resume Upload" />
+        </div>
+      </div>
+
+      <!-- Q10: City Short Text (Optional) -->
+      <div role="listitem" class="question-card" data-item-id="q10">
+        <div role="heading" aria-level="2" class="question-title">
+          <span>City</span>
+        </div>
+        <div class="input-container">
+          <input type="text" name="entry.100000010" aria-label="City" />
+        </div>
+      </div>
+
+      <!-- Q11: Additional Comments (Optional) -->
+      <div role="listitem" class="question-card" data-item-id="q11">
+        <div role="heading" aria-level="2" class="question-title">
+          <span>Additional Comments</span>
+        </div>
+        <div class="input-container">
+          <textarea name="entry.100000011" aria-label="Additional Comments" rows="2"></textarea>
+        </div>
+      </div>
+
+      <!-- Form Navigation Buttons -->
+      <div class="button-bar">
+        <div role="button" class="btn submit-btn" tabindex="0">Submit</div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Embedded Google Forms Metadata
+    var FB_PUBLIC_LOAD_DATA_ = [
+      null,
+      [
+        null,
+        [
+          // Q1: Short text
+          [1001, "Full Name", null, 0, [[100000001, null, 1]]],
+          // Q2: Paragraph
+          [1002, "Detailed Feedback", null, 1, [[100000002, null, 1]]],
+          // Q3: Multiple choice
+          [1003, "Preferred Language", null, 2, [[100000003, [["Hindi"], ["English"], ["Hinglish"]], 1]]],
+          // Q4: Checkboxes
+          [1004, "Skills", null, 4, [[100000004, [["JavaScript"], ["Python"], ["React"], ["Node.js"]], 1]]],
+          // Q5: Dropdown
+          [1005, "Experience Level", null, 3, [[100000005, [["Beginner"], ["Intermediate"], ["Advanced"]], 1]]],
+          // Q6: Linear scale
+          [1006, "Rating", null, 5, [[100000006, [["1"], ["2"], ["3"], ["4"], ["5"]], 0]]],
+          // Q7: Date
+          [1007, "Date of Birth", null, 9, [[100000007, null, 0]]],
+          // Q8: Time
+          [1008, "Available Time", null, 10, [[100000008, null, 0]]],
+          // Q9: File upload
+          [1009, "Resume Upload", null, 13, [[100000009, null, 0]]],
+          // Q10: City
+          [1010, "City", null, 0, [[100000010, null, 0]]],
+          // Q11: Comments
+          [1011, "Additional Comments", null, 1, [[100000011, null, 0]]]
+        ],
+        null, null, null, null, null, null,
+        "Form A Customer Feedback"
+      ]
+    ];
+
+    // Minimal interactivity for fixture testing (dropdown opening/closing and radio/checkbox selection)
+    document.querySelectorAll('.dropdown-container').forEach(el => {
+      el.addEventListener('click', () => {
+        const opts = el.querySelector('.dropdown-options');
+        const isExp = el.getAttribute('aria-expanded') === 'true';
+        el.setAttribute('aria-expanded', !isExp ? 'true' : 'false');
+        if (opts) opts.style.display = !isExp ? 'block' : 'none';
+      });
+      el.querySelectorAll('[role="option"]').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const sel = el.querySelector('.dropdown-selected');
+          if (sel) sel.textContent = opt.textContent;
+          el.querySelectorAll('[role="option"]').forEach(o => o.setAttribute('aria-selected', 'false'));
+          opt.setAttribute('aria-selected', 'true');
+          el.setAttribute('aria-expanded', 'false');
+          const opts = el.querySelector('.dropdown-options');
+          if (opts) opts.style.display = 'none';
+        });
+      });
+    });
+
+    document.querySelectorAll('[role="radio"]').forEach(el => {
+      el.addEventListener('click', () => {
+        const group = el.closest('[role="radiogroup"]');
+        if (group) {
+          group.querySelectorAll('[role="radio"]').forEach(r => r.setAttribute('aria-checked', 'false'));
+        }
+        el.setAttribute('aria-checked', 'true');
+      });
+    });
+
+    document.querySelectorAll('[role="checkbox"]').forEach(el => {
+      el.addEventListener('click', () => {
+        const checked = el.getAttribute('aria-checked') === 'true';
+        el.setAttribute('aria-checked', checked ? 'false' : 'true');
+      });
+    });
+  </script>
+</body>
+</html>

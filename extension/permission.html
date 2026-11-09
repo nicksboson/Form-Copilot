@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Copilot - Microphone Permission</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #f8fafc;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 36px;
+      max-width: 440px;
+      text-align: center;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+    }
+    h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+    p {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    button {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    button:hover {
+      background: #4338ca;
+    }
+    .success {
+      display: none;
+      color: #059669;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>माइक की अनुमति (Microphone Permission)</h1>
+    <p>
+      Form Copilot को आपकी आवाज सुनने के लिए माइक्रोफ़ोन की अनुमति चाहिए। नीचे दिए गए बटन पर क्लिक करें और ब्राउज़र पॉपअप में <strong>Allow</strong> चुनें।
+    </p>
+    <button id="grantBtn">माइक की अनुमति दें (Allow Microphone)</button>
+    <div id="successMsg" class="success">
+      अनुमति मिल गई! यह विंडो 2 सेकंड में बंद हो जाएगी...
+    </div>
+  </div>
+  <script type="module" src="./src/permission.ts"></script>
+</body>
+</html>

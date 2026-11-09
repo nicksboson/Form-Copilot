@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Form B - Multi-Page Application Form</title>
+  <style>
+    body { font-family: Roboto, Arial, sans-serif; background: #e8f0fe; margin: 0; padding: 20px; }
+    .form-container { max-width: 640px; margin: 0 auto; background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .header { border-top: 10px solid #1a73e8; border-radius: 8px 8px 0 0; padding-bottom: 16px; margin-bottom: 20px; }
+    .page-indicator { color: #5f6368; font-size: 14px; margin-bottom: 12px; }
+    .question-card { border: 1px solid #dadce0; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .question-title { font-size: 16px; font-weight: 500; margin-bottom: 12px; }
+    .required-asterisk { color: #d93025; margin-left: 4px; }
+    input[type="text"], textarea { width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 8px; box-sizing: border-box; }
+    .radio-option, .checkbox-option { display: flex; align-items: center; margin: 8px 0; cursor: pointer; }
+    .button-bar { display: flex; justify-content: space-between; margin-top: 24px; }
+    .btn { background: #1a73e8; color: #fff; border: none; border-radius: 4px; padding: 10px 24px; font-size: 14px; cursor: pointer; }
+    .btn-secondary { background: #fff; color: #1a73e8; border: 1px solid #dadce0; }
+    .form-page { display: none; }
+    .form-page.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <div class="header">
+      <h1 role="heading" aria-level="1">Form B Multi-Page Application</h1>
+      <div class="page-indicator" id="pageIndicator">Page 1 of 3</div>
+    </div>
+
+    <form role="form" id="multiPageForm">
+      <!-- PAGE 1 (5 questions: Q1 to Q5) -->
+      <div class="form-page active" data-page-index="0" id="page1">
+        <!-- Q1 -->
+        <div role="listitem" class="question-card" data-item-id="b_q1">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>First Name</span>
+            <span class="required-asterisk" aria-label="Required question">*</span>
+          </div>
+          <div class="input-container">
+            <input type="text" name="entry.200000001" aria-label="First Name" required />
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div role="listitem" class="question-card" data-item-id="b_q2">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Last Name</span>
+            <span class="required-asterisk" aria-label="Required question">*</span>
+          </div>
+          <div class="input-container">
+            <input type="text" name="entry.200000002" aria-label="Last Name" required />
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div role="listitem" class="question-card" data-item-id="b_q3">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Email Address</span>
+            <span class="required-asterisk" aria-label="Required question">*</span>
+          </div>
+          <div class="input-container">
+            <input type="text" name="entry.200000003" aria-label="Email Address" required />
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div role="listitem" class="question-card" data-item-id="b_q4">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Phone Number</span>
+          </div>
+          <div class="input-container">
+            <input type="text" name="entry.200000004" aria-label="Phone Number" />
+          </div>
+        </div>
+
+        <!-- Q5 (Branching question: routes to Page 2 or Page 3) -->
+        <div role="listitem" class="question-card" data-item-id="b_q5" data-branch="true">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Do you have prior technical experience?</span>
+            <span class="required-asterisk" aria-label="Required question">*</span>
+          </div>
+          <div role="radiogroup" aria-label="Do you have prior technical experience?">
+            <div role="radio" aria-checked="false" tabindex="0" class="radio-option" data-value="Yes" data-goto-page="2">
+              <span class="option-label">Yes</span>
+            </div>
+            <div role="radio" aria-checked="false" tabindex="-1" class="radio-option" data-value="No" data-goto-page="3">
+              <span class="option-label">No</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 2 (4 questions: Q6 to Q9) -->
+      <div class="form-page" data-page-index="1" id="page2">
+        <!-- Q6 -->
+        <div role="listitem" class="question-card" data-item-id="b_q6">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Years of Technical Experience</span>
+            <span class="required-asterisk" aria-label="Required question">*</span>
+          </div>
+          <div class="input-container">
+            <input type="text" name="entry.200000006" aria-label="Years of Technical Experience" />
+          </div>
+        </div>
+
+        <!-- Q7 -->
+        <div role="listitem" class="question-card" data-item-id="b_q7">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Primary Programming Language</span>
+            <span class="required-asterisk" aria-label="Required question">*</span>
+          </div>
+          <div role="radiogroup" aria-label="Primary Programming Language">
+            <div role="radio" aria-checked="false" class="radio-option" data-value="TypeScript">
+              <span class="option-label">TypeScript</span>
+            </div>
+            <div role="radio" aria-checked="false" class="radio-option" data-value="Python">
+              <span class="option-label">Python</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q8 -->
+        <div role="listitem" class="question-card" data-item-id="b_q8">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Github Profile URL</span>
+          </div>
+          <div class="input-container">
+            <input type="text" name="entry.200000008" aria-label="Github Profile URL" />
+          </div>
+        </div>
+
+        <!-- Q9 -->
+        <div role="listitem" class="question-card" data-item-id="b_q9">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Notable Projects Summary</span>
+          </div>
+          <div class="input-container">
+            <textarea name="entry.200000009" aria-label="Notable Projects Summary" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 3 (5 questions: Q10 to Q14) -->
+      <div class="form-page" data-page-index="2" id="page3">
+        <!-- Q10 -->
+        <div role="listitem" class="question-card" data-item-id="b_q10">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Availability Start Date</span>
+            <span class="required-asterisk" aria-label="Required question">*</span>
+          </div>
+          <div class="input-container">
+            <input type="date" name="entry.200000010" aria-label="Availability Start Date" />
+          </div>
+        </div>
+
+        <!-- Q11 -->
+        <div role="listitem" class="question-card" data-item-id="b_q11">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Desired Role Type</span>
+            <span class="required-asterisk" aria-label="Required question">*</span>
+          </div>
+          <div role="radiogroup" aria-label="Desired Role Type">
+            <div role="radio" aria-checked="false" class="radio-option" data-value="Full-time">
+              <span class="option-label">Full-time</span>
+            </div>
+            <div role="radio" aria-checked="false" class="radio-option" data-value="Part-time">
+              <span class="option-label">Part-time</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q12 -->
+        <div role="listitem" class="question-card" data-item-id="b_q12">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Expected Salary</span>
+          </div>
+          <div class="input-container">
+            <input type="text" name="entry.200000012" aria-label="Expected Salary" />
+          </div>
+        </div>
+
+        <!-- Q13 -->
+        <div role="listitem" class="question-card" data-item-id="b_q13">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Willingness to Relocate</span>
+          </div>
+          <div role="radiogroup" aria-label="Willingness to Relocate">
+            <div role="radio" aria-checked="false" class="radio-option" data-value="Yes">
+              <span class="option-label">Yes</span>
+            </div>
+            <div role="radio" aria-checked="false" class="radio-option" data-value="No">
+              <span class="option-label">No</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q14 -->
+        <div role="listitem" class="question-card" data-item-id="b_q14">
+          <div role="heading" aria-level="2" class="question-title">
+            <span>Any Special Requirements</span>
+          </div>
+          <div class="input-container">
+            <textarea name="entry.200000014" aria-label="Any Special Requirements" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation buttons -->
+      <div class="button-bar">
+        <div role="button" class="btn btn-secondary back-btn" id="backBtn" tabindex="0" style="display:none;">Back</div>
+        <div role="button" class="btn next-btn" id="nextBtn" tabindex="0">Next</div>
+        <div role="button" class="btn submit-btn" id="submitBtn" tabindex="0" style="display:none;">Submit</div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Embedded Google Forms Metadata for Form B
+    // 3 Pages: 5 questions on Page 1, 4 questions on Page 2, 5 questions on Page 3.
+    // Q5 has routing / branching.
+    var FB_PUBLIC_LOAD_DATA_ = [
+      null,
+      [
+        null,
+        [
+          // PAGE 1: 5 Questions
+          [2001, "First Name", null, 0, [[200000001, null, 1]]],
+          [2002, "Last Name", null, 0, [[200000002, null, 1]]],
+          [2003, "Email Address", null, 0, [[200000003, null, 1]]],
+          [2004, "Phone Number", null, 0, [[200000004, null, 0]]],
+          // Q5 with branching (choice 0 routes to page 2, choice 1 routes to page 3)
+          [2005, "Do you have prior technical experience?", null, 2, [[200000005, [["Yes", null, null, null, 1], ["No", null, null, null, 2]], 1]]],
+
+          // SECTION BREAK: Page 2
+          [2006, "Technical Background", "Details about technical work", 8, null],
+
+          // PAGE 2: 4 Questions
+          [2007, "Years of Technical Experience", null, 0, [[200000006, null, 1]]],
+          [2008, "Primary Programming Language", null, 2, [[200000007, [["TypeScript"], ["Python"]], 1]]],
+          [2009, "Github Profile URL", null, 0, [[200000008, null, 0]]],
+          [2010, "Notable Projects Summary", null, 1, [[200000009, null, 0]]],
+
+          // SECTION BREAK: Page 3
+          [2011, "Availability & Logistics", "General logistics and role preference", 8, null],
+
+          // PAGE 3: 5 Questions
+          [2012, "Availability Start Date", null, 9, [[200000010, null, 1]]],
+          [2013, "Desired Role Type", null, 2, [[200000011, [["Full-time"], ["Part-time"]], 1]]],
+          [2014, "Expected Salary", null, 0, [[200000012, null, 0]]],
+          [2015, "Willingness to Relocate", null, 2, [[200000013, [["Yes"], ["No"]], 0]]],
+          [2016, "Any Special Requirements", null, 1, [[200000014, null, 0]]]
+        ],
+        null, null, null, null, null, null,
+        "Form B Multi-Page Application"
+      ]
+    ];
+
+    // Navigation logic for fixture testing
+    let currentPage = 0;
+    const pages = [document.getElementById('page1'), document.getElementById('page2'), document.getElementById('page3')];
+    const backBtn = document.getElementById('backBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const indicator = document.getElementById('pageIndicator');
+
+    function updateNav() {
+      pages.forEach((p, idx) => {
+        if (p) p.classList.toggle('active', idx === currentPage);
+      });
+      indicator.textContent = 'Page ' + (currentPage + 1) + ' of 3';
+      backBtn.style.display = currentPage > 0 ? 'inline-block' : 'none';
+      nextBtn.style.display = currentPage < 2 ? 'inline-block' : 'none';
+      submitBtn.style.display = currentPage === 2 ? 'inline-block' : 'none';
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (currentPage < 2) {
+        currentPage++;
+        updateNav();
+      }
+    });
+
+    backBtn.addEventListener('click', () => {
+      if (currentPage > 0) {
+        currentPage--;
+        updateNav();
+      }
+    });
+
+    document.querySelectorAll('[role="radio"]').forEach(el => {
+      el.addEventListener('click', () => {
+        const group = el.closest('[role="radiogroup"]');
+        if (group) {
+          group.querySelectorAll('[role="radio"]').forEach(r => r.setAttribute('aria-checked', 'false'));
+        }
+        el.setAttribute('aria-checked', 'true');
+      });
+    });
+  </script>
+</body>
+</html>

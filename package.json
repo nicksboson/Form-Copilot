@@ -1,0 +1,27 @@
+{
+  "name": "form-copilot-root",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "backend",
+    "extension"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "backend:dev": "npm --workspace=backend run dev",
+    "extension:dev": "npm --workspace=extension run dev",
+    "extension:build": "npm --workspace=extension run build",
+    "build": "npm --workspace=shared run build && npm --workspace=backend run build && npm --workspace=extension run build"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.1",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true,
+    "esbuild@0.28.2": true
+  }
+}
