@@ -11,6 +11,7 @@
 [![Gnani Voice AI](https://img.shields.io/badge/Gnani-Prisma_%26_Timbre-7C3AED)](https://docs.gnani.ai)
 [![Node.js](https://img.shields.io/badge/Backend-Node.js_20+-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![Render Live](https://img.shields.io/badge/Production_Backend-Render_Live-00b894?logo=render&logoColor=white)](https://form-copilot.onrender.com/api/health)
+[![Download Release](https://img.shields.io/badge/Download_Extension-v1.0.0_ZIP-2563EB?logo=github&logoColor=white)](https://github.com/nicksboson/Form-Copilot/releases)
 [![Vitest](https://img.shields.io/badge/Unit_Tests-Vitest_Passing-729B1B?logo=vitest&logoColor=white)](https://vitest.dev)
 [![Playwright](https://img.shields.io/badge/E2E_Tests-Playwright_Passing-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev)
 
@@ -274,9 +275,31 @@ VoiceForm/
 
 ## Quick Start
 
-### Option A: Zero Local Setup (Connects to Live Render Backend)
+### Option 1: Quick Install via GitHub Releases (Recommended - No Coding Required)
 
-The extension is pre-configured to connect to the deployed live production backend at `https://form-copilot.onrender.com`.
+You do **not** need Node.js, Git, or API keys installed on your computer. The extension is pre-compiled and automatically connects to the deployed live production backend at `https://form-copilot.onrender.com`.
+
+1. **Download the Extension Archive**:
+   Go to **[GitHub Releases](https://github.com/nicksboson/Form-Copilot/releases)** and download `form-copilot-v1.0.0.zip`.
+2. **Extract the ZIP**:
+   Unzip `form-copilot-v1.0.0.zip` to any folder on your computer (for example, in your Downloads or Desktop folder).
+3. **Open Chrome Extensions**:
+   In Google Chrome, open a new tab and paste this URL into the address bar:
+   ```
+   chrome://extensions/
+   ```
+4. **Enable Developer Mode**:
+   Toggle on the **Developer mode** switch located in the upper-right corner.
+5. **Load Unpacked Extension**:
+   Click the **Load unpacked** button in the top-left corner, and select the extracted folder.
+6. **Open Google Forms**:
+   Navigate to any Google Form (for example, `https://docs.google.com/forms/d/e/.../viewform`).
+7. **Start Form Copilot**:
+   Click the **Form Copilot** extension puzzle icon in your Chrome toolbar. The glassmorphic sidepanel will open immediately, ready for multilingual voice form navigation.
+
+---
+
+### Option 2: Build from Source (For Developers)
 
 1. Clone the repository:
    ```bash
@@ -291,12 +314,13 @@ The extension is pre-configured to connect to the deployed live production backe
    ```
    Form-Copilot/extension/dist
    ```
-5. Open any Google Form (`https://docs.google.com/forms/*`).
-6. Click the **Form Copilot** extension icon to open the sidepanel and start interacting immediately.
+5. Open any Google Form (`https://docs.google.com/forms/*`) and click the Form Copilot icon.
 
 ---
 
-### Option B: Local Development / Self-Hosted Setup
+### Option 3: Local Self-Hosted Backend (Optional)
+
+If you prefer to run your own local backend server rather than using the live Render deployment:
 
 1. **Configure Environment**:
    ```bash
