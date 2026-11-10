@@ -10,6 +10,7 @@
 [![Groq LLM](https://img.shields.io/badge/Groq-gpt--oss--120b-F55036)](https://console.groq.com)
 [![Gnani Voice AI](https://img.shields.io/badge/Gnani-Prisma_%26_Timbre-7C3AED)](https://docs.gnani.ai)
 [![Node.js](https://img.shields.io/badge/Backend-Node.js_20+-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![Render Live](https://img.shields.io/badge/Production_Backend-Render_Live-00b894?logo=render&logoColor=white)](https://form-copilot.onrender.com/api/health)
 [![Vitest](https://img.shields.io/badge/Unit_Tests-Vitest_Passing-729B1B?logo=vitest&logoColor=white)](https://vitest.dev)
 [![Playwright](https://img.shields.io/badge/E2E_Tests-Playwright_Passing-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev)
 
@@ -21,11 +22,13 @@
   <a href="#overview">Overview</a> &bull;
   <a href="#architecture">Architecture</a> &bull;
   <a href="#core-capabilities">Capabilities</a> &bull;
-  <a href="#api-keys--security">API Keys & Security</a> &bull;
+  <a href="#ai-engine-integration">AI Engine (Gnani + Groq)</a> &bull;
+  <a href="#api-keys--security">Security</a> &bull;
   <a href="#multilingual-matrix">Languages</a> &bull;
   <a href="#project-structure">Project Structure</a> &bull;
   <a href="#quick-start">Quick Start</a> &bull;
-  <a href="#testing">Testing</a>
+  <a href="#testing">Testing</a> &bull;
+  <a href="#acknowledgments">Acknowledgments</a>
 </p>
 
 </div>
@@ -50,7 +53,7 @@ Filling long or complex Google Forms can be intimidating, especially when naviga
   <img src="architecture_diagram.png" alt="Form Copilot System Architecture" width="100%" />
 </div>
 
-Form Copilot separates duties across browser client contexts, a local Node.js proxy service, and cloud inference APIs to guarantee security and zero key leakage:
+Form Copilot separates duties across browser client contexts, a local/cloud proxy service, and cloud inference APIs to guarantee security and zero key leakage:
 
 ```mermaid
 flowchart TD
@@ -65,7 +68,7 @@ flowchart TD
         BackgroundWorker <-->|"Port & Event Relays"| SidepanelUI
     end
 
-    subgraph LocalBackend["Local Backend Server (Node.js Express :3001)"]
+    subgraph BackendProxy["Express Backend Proxy (Render Production / Local :3001)"]
         ExpressApp["Express API Server<br/>https://form-copilot.onrender.com"]
         HealthRoute["/api/health<br/>Status & Key Verification"]
         LLMRoute["/api/llm<br/>Summary & Conversation Engine"]
@@ -102,6 +105,20 @@ flowchart TD
 | **5. AI Dialogue** | Sidepanel | Backend (`/api/llm/chat`) | HTTP POST JSON | Groq evaluates user speech against form questions and returns structured guidance. |
 | **6. Voice Output** | Sidepanel | Backend (`/api/tts`) | HTTP POST JSON | Synthesizes response speech using Gnani Timbre v2.5; plays back in sidepanel. |
 | **7. Field Fill** | Sidepanel | Content Script | `FILL_FIELD` message | Simulates user input and native Closure/Wiz events with explicit confirmation. |
+
+---
+
+## AI Engine Integration
+
+Form Copilot uses a secure proxy architecture combining **Gnani Voice AI** and **Groq Cloud Inference**:
+
+> Form Copilot routes user audio through a Node.js proxy to **Gnani Voice AI** (Prisma v3.0 STT and Timbre v2.5 TTS) in 16 kHz WAV format, delivering sub-second multilingual speech recognition and voice synthesis across 8 Indian languages. Transcripts and extracted Google Form snapshots are then evaluated by **Groq Cloud** (`openai/gpt-oss-120b` on LPUs) under strict JSON schemas to reason over form fields, understand user intent, and propose answers in real time. Together, Gnani manages native voice I/O while Groq handles conversational logic, enabling hands-free form filling with complete credential isolation.
+
+### Technical Roles
+
+- **Gnani Prisma v3.0 STT**: Ingests 16,000 Hz 16-bit mono WAV PCM audio; automatically detects dialects across Hindi, Tamil, Telugu, and 5 regional languages with a fallback to `prisma-v2.5`.
+- **Gnani Timbre v2.5 TTS**: Synthesizes high-naturalness regional audio directly from backend text replies for sidepanel playback.
+- **Groq LPU Inference (`openai/gpt-oss-120b`)**: High-throughput conversational reasoning adhering to token budgets; keeps required questions intact and outputs strictly typed JSON.
 
 ---
 
@@ -151,43 +168,20 @@ The sidepanel is designed with a modern, distraction-free aesthetic:
 Form Copilot maintains a zero-trust credential model.
 
 > [!IMPORTANT]
-> API keys are never bundled into extension files, manifests, content scripts, or network calls from the browser. All third-party AI requests are proxied securely through the local backend.
+> API keys are never bundled into extension files, manifests, content scripts, or network calls from the browser. All third-party AI requests are proxied securely through the backend.
 
 ```mermaid
 flowchart LR
     Extension["Chrome Extension<br/>(Side Panel)"]
-    LocalBackend["Express Backend<br/>(localhost:3001)"]
-    EnvFile[".env File<br/>(Root Directory)"]
+    Backend["Backend Service<br/>(Render Production / Local)"]
+    EnvFile[".env File<br/>(Server Secrets)"]
     ExternalGroq["Groq Cloud"]
     ExternalGnani["Gnani AI"]
 
-    Extension -->|"HTTP (No Keys)"| LocalBackend
-    LocalBackend -->|"Reads at Boot"| EnvFile
-    LocalBackend -->|"Bearer Key"| ExternalGroq
-    LocalBackend -->|"X-API-Key-ID"| ExternalGnani
-```
-
-### Backend `.env` Specification
-
-Create a `.env` file in the project root:
-
-```env
-# Server Port (default: 3001)
-PORT=3001
-
-# Groq Cloud API Credentials (Required for form summarization and conversational agent)
-# Documentation: https://console.groq.com
-GROQ_API_KEY=your_groq_api_key_here
-GROQ_API=your_groq_api_key_here
-GROQ_MODEL=openai/gpt-oss-120b
-
-# Gnani Voice API Credentials (Required for Speech-to-Text and Text-to-Speech)
-# Documentation: https://docs.gnani.ai
-GNANI_API_KEY=your_gnani_api_key_here
-GNANI_API=your_gnani_api_key_here
-
-# Allowed Chrome Extension Origin Pattern
-ALLOWED_ORIGIN=chrome-extension://*
+    Extension -->|"HTTP (No Keys)"| Backend
+    Backend -->|"Reads at Boot"| EnvFile
+    Backend -->|"Bearer Key"| ExternalGroq
+    Backend -->|"X-API-Key-ID"| ExternalGnani
 ```
 
 ### Health Verification Endpoint
@@ -198,11 +192,11 @@ The backend provides a safe health inspection route:
 GET /api/health
 ```
 
-**Example Response**:
+**Live Production Response** (`https://form-copilot.onrender.com/api/health`):
 ```json
 {
   "status": "ok",
-  "timestamp": "2026-11-10T04:39:15.908Z",
+  "timestamp": "2026-11-10T16:40:24.224Z",
   "service": "Form Copilot Backend",
   "configured": {
     "groq": true,
@@ -244,9 +238,12 @@ VoiceForm/
 ├── package-lock.json                 # Dependency lockfile
 ├── playwright.config.ts              # Playwright test configuration
 ├── vitest.config.ts                  # Vitest test configuration
+├── WALKTHROUGH_SCRIPT.md             # 2.5-minute video walkthrough presentation script
+├── architecture_diagram.png          # High-resolution 2K architecture diagram
+├── architecture.svg                  # Vector source architecture diagram
 ├── README.md                         # Project documentation
 │
-├── backend/                          # Local Node.js Express API service
+├── backend/                          # Node.js Express API service (Local & Render)
 │   ├── .env.example                  # Backend template for environment settings
 │   ├── package.json                  # Backend dependencies and scripts
 │   ├── tsconfig.json                 # TypeScript compiler configuration
@@ -261,7 +258,7 @@ VoiceForm/
 │           └── tts.ts                # Speech synthesis endpoint
 │
 ├── extension/                        # Chrome Manifest V3 Extension
-│   ├── manifest.config.ts            # Manifest V3 configuration
+│   ├── manifest.config.ts            # Manifest V3 configuration (with Render permissions)
 │   ├── package.json                  # Extension dependencies and scripts
 │   ├── tsconfig.json                 # Extension TypeScript compiler settings
 │   ├── vite.config.ts                # Vite + CRXJS packaging pipeline
@@ -282,7 +279,7 @@ VoiceForm/
 │       │   ├── overlay.ts            # Scanning progress indicator
 │       │   └── selectors.ts          # Central Google Forms DOM selectors
 │       ├── settings/
-│       │   └── index.ts              # Backend URL persistence & health client
+│       │   └── index.ts              # Default backend URL (https://form-copilot.onrender.com)
 │       └── sidepanel/
 │           ├── App.tsx               # Root application state machine & UI shell
 │           ├── index.tsx             # React mount entrypoint
@@ -324,56 +321,56 @@ VoiceForm/
 
 ## Quick Start
 
-### 1. Clone & Install
+### Option A: Zero Local Setup (Connects to Live Render Backend)
 
-```bash
-git clone https://github.com/your-repo/VoiceForm.git
-cd VoiceForm
-npm install
-```
+The extension is pre-configured to connect to the deployed live production backend at `https://form-copilot.onrender.com`.
 
-### 2. Configure Environment
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/nicksboson/Form-Copilot.git
+   cd Form-Copilot
+   npm install
+   npm run extension:build
+   ```
+2. Open Google Chrome and navigate to `chrome://extensions/`.
+3. Enable **Developer mode** (toggle in top right).
+4. Click **Load unpacked** and select the folder:
+   ```
+   Form-Copilot/extension/dist
+   ```
+5. Open any Google Form (`https://docs.google.com/forms/*`).
+6. Click the **Form Copilot** extension icon to open the sidepanel and start interacting immediately.
 
-Copy `.env.example` to `.env` and insert your API keys:
+---
 
-```bash
-cp .env.example .env
-```
+### Option B: Local Development / Self-Hosted Setup
 
-Edit `.env`:
-```env
-PORT=3001
-GROQ_API_KEY=gsk_your_groq_api_key
-GNANI_API_KEY=vach_your_gnani_api_key
-```
+1. **Configure Environment**:
+   ```bash
+   cp .env.example .env
+   ```
+   Set your keys in `.env`:
+   ```env
+   PORT=3001
+   GROQ_API_KEY=your_groq_key
+   GNANI_API_KEY=your_gnani_key
+   GROQ_MODEL=openai/gpt-oss-120b
+   ```
 
-### 3. Build Workspaces
+2. **Build and Start Backend**:
+   ```bash
+   npm run backend:build
+   npm run backend:start
+   ```
+   *Backend starts at `http://localhost:3001`.*
 
-```bash
-# Build shared library schemas
-npm --workspace=shared run build
+3. **Build Extension**:
+   ```bash
+   npm run extension:build
+   ```
 
-# Build Chrome Extension
-npm --workspace=extension run build
-
-# Build Backend Server
-npm --workspace=backend run build
-```
-
-### 4. Start Local Backend
-
-```bash
-npm --workspace=backend run start
-```
-*Server starts on `http://localhost:3001` (or use the deployed production backend at `https://form-copilot.onrender.com`).*
-
-### 5. Load in Chrome
-
-1. Navigate to `chrome://extensions/` in Google Chrome.
-2. Toggle on **Developer mode** in the upper right.
-3. Click **Load unpacked** and select `VoiceForm/extension/dist`.
-4. Open any Google Form (`docs.google.com/forms/*`).
-5. Click the **Form Copilot** extension icon to open the sidepanel.
+4. **Change Backend URL to Local**:
+   In the sidepanel header, open **Settings**, set the URL to `http://localhost:3001`, and click **Save**.
 
 ---
 
@@ -385,7 +382,7 @@ npm --workspace=backend run start
 | **No Auto-Submit** | Never clicks `Submit`, `Next`, or `Back` in reader mode. Form submission remains entirely user-controlled. |
 | **No Silent Overwrites** | Pre-existing input values are never overwritten without explicit user confirmation. |
 | **Confirmation Required** | Form filling actions require explicit user approval via sidepanel button or voice confirmation. |
-| **Zero Extension Secrets** | Extension bundle and network traffic contain zero API keys. All calls proxy through the local backend. |
+| **Zero Extension Secrets** | Extension bundle and network traffic contain zero API keys. All calls proxy through the backend. |
 | **Clean Design Standards** | Translucent Apple-style glassmorphism with zero emojis in code, UI, or markdown documents. |
 
 ---
@@ -410,3 +407,9 @@ npm run test:e2e
 - **Check 4**: Scanning overlay displays during extraction and cleans up reliably in `finally`.
 - **Check 5**: Prevents clicks on Submit, Next, or Back navigation buttons.
 - **Check 6**: Event simulation verifies text entry, radio selection, and overwrite protection.
+
+---
+
+## Acknowledgments
+
+Special thanks to the **Gnani.ai Hackathon Team** for providing the opportunity, mentorship, and platform to build with state-of-the-art Indian language voice models (**Prisma STT** and **Timbre TTS**). This hackathon served as the catalyst for engineering Form Copilot and advancing accessible, voice-driven web automation for regional language speakers.
