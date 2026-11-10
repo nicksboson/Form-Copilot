@@ -10,6 +10,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "backend:dev": "npm --workspace=backend run dev",
+    "backend:build": "npm --workspace=shared run build && npm --workspace=backend run build",
+    "backend:start": "node backend/dist/server.js",
     "extension:dev": "npm --workspace=extension run dev",
     "extension:build": "npm --workspace=extension run build",
     "build": "npm --workspace=shared run build && npm --workspace=backend run build && npm --workspace=extension run build"

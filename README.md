@@ -46,6 +46,10 @@ Filling long or complex Google Forms can be intimidating, especially when naviga
 
 ## Architecture
 
+<div align="center">
+  <img src="architecture_diagram.png" alt="Form Copilot System Architecture" width="100%" />
+</div>
+
 Form Copilot separates duties across browser client contexts, a local Node.js proxy service, and cloud inference APIs to guarantee security and zero key leakage:
 
 ```mermaid
