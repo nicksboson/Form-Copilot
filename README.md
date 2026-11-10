@@ -19,15 +19,15 @@
 </p>
 
 <p align="center">
-  <a href="#overview">Overview</a> &bull;
-  <a href="#architecture">Architecture</a> &bull;
-  <a href="#core-capabilities">Capabilities</a> &bull;
-  <a href="#ai-engine-integration">AI Engine (Gnani + Groq)</a> &bull;
-  <a href="#api-keys--security">Security</a> &bull;
-  <a href="#multilingual-matrix">Languages</a> &bull;
-  <a href="#project-structure">Project Structure</a> &bull;
-  <a href="#quick-start">Quick Start</a> &bull;
-  <a href="#testing">Testing</a> &bull;
+  <a href="#overview">Overview</a> •
+  <a href="#system-pipeline">System Pipeline</a> •
+  <a href="#ai-engine-integration">AI Engine</a> •
+  <a href="#core-capabilities">Capabilities</a> •
+  <a href="#api-keys--security">Security</a> •
+  <a href="#multilingual-matrix">Languages</a> •
+  <a href="#project-structure">Project Structure</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#testing">Testing</a> •
   <a href="#acknowledgments">Acknowledgments</a>
 </p>
 
@@ -47,54 +47,9 @@ Filling long or complex Google Forms can be intimidating, especially when naviga
 
 ---
 
-## Architecture
+## System Pipeline
 
-<div align="center">
-  <img src="architecture_diagram.png" alt="Form Copilot System Architecture" width="100%" />
-</div>
-
-Form Copilot separates duties across browser client contexts, a local/cloud proxy service, and cloud inference APIs to guarantee security and zero key leakage:
-
-```mermaid
-flowchart TD
-    subgraph Browser["Google Chrome (Active Tab & Extension)"]
-        FormTab["Google Form Active Tab<br/>docs.google.com/forms/*"]
-        ContentScript["Content Scripts<br/>reader.ts | embedded.ts | filler.ts"]
-        BackgroundWorker["Extension Service Worker<br/>background/index.ts"]
-        SidepanelUI["React Side Panel UI<br/>App.tsx | ChatView | VoiceSimulation"]
-
-        FormTab <-->|"DOM Inspection & Event Dispatch"| ContentScript
-        ContentScript <-->|"Chrome Runtime Messages"| BackgroundWorker
-        BackgroundWorker <-->|"Port & Event Relays"| SidepanelUI
-    end
-
-    subgraph BackendProxy["Express Backend Proxy (Render Production / Local :3001)"]
-        ExpressApp["Express API Server<br/>https://form-copilot.onrender.com"]
-        HealthRoute["/api/health<br/>Status & Key Verification"]
-        LLMRoute["/api/llm<br/>Summary & Conversation Engine"]
-        STTRoute["/api/stt<br/>Prisma Audio Transcription"]
-        TTSRoute["/api/tts<br/>Timbre Speech Synthesis"]
-
-        ExpressApp --> HealthRoute
-        ExpressApp --> LLMRoute
-        ExpressApp --> STTRoute
-        ExpressApp --> TTSRoute
-    end
-
-    subgraph CloudAPIs["External AI Providers"]
-        GroqAPI["Groq Cloud API<br/>openai/gpt-oss-120b"]
-        GnaniSTT["Gnani Prisma STT API<br/>Speech-to-Text"]
-        GnaniTTS["Gnani Timbre TTS API<br/>Text-to-Speech"]
-
-        LLMRoute -->|"HTTPS Bearer Auth"| GroqAPI
-        STTRoute -->|"HTTPS X-API-Key-ID"| GnaniSTT
-        TTSRoute -->|"HTTPS X-API-Key-ID"| GnaniTTS
-    end
-
-    SidepanelUI <-->|"HTTP JSON / Audio Fetch"| ExpressApp
-```
-
-### Communication Pipeline
+Form Copilot separates duties across browser client contexts, a local/cloud proxy service, and cloud inference APIs to guarantee security and zero key leakage.
 
 | Step | Initiator | Target | Protocol / Payload | Description |
 | :--- | :--- | :--- | :--- | :--- |
@@ -239,8 +194,6 @@ VoiceForm/
 ├── playwright.config.ts              # Playwright test configuration
 ├── vitest.config.ts                  # Vitest test configuration
 ├── WALKTHROUGH_SCRIPT.md             # 2.5-minute video walkthrough presentation script
-├── architecture_diagram.png          # High-resolution 2K architecture diagram
-├── architecture.svg                  # Vector source architecture diagram
 ├── README.md                         # Project documentation
 │
 ├── backend/                          # Node.js Express API service (Local & Render)
