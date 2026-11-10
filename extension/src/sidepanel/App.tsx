@@ -11,7 +11,7 @@ import {
   Diagnostics,
   Question,
 } from 'form-copilot-shared';
-import { getBackendUrl } from '../settings';
+import { getBackendUrl, DEFAULT_BACKEND_URL } from '../settings';
 import { SummaryCard } from './components/SummaryCard';
 import { QuestionNav } from './components/QuestionNav';
 import { ChatView, ChatMessage } from './components/ChatView';
@@ -70,7 +70,7 @@ export const App: React.FC = () => {
   const [isProcessingChat, setIsProcessingChat] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fillLogs, setFillLogs] = useState<FillResult[]>([]);
-  const [backendUrl, setBackendUrlState] = useState<string>('http://localhost:3001');
+  const [backendUrl, setBackendUrlState] = useState<string>(DEFAULT_BACKEND_URL);
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageOption>(SUPPORTED_LANGUAGES[0]);
   const ui = getUIStrings(selectedLanguage.code);

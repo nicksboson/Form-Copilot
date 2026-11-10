@@ -66,7 +66,7 @@ flowchart TD
     end
 
     subgraph LocalBackend["Local Backend Server (Node.js Express :3001)"]
-        ExpressApp["Express API Server<br/>http://localhost:3001"]
+        ExpressApp["Express API Server<br/>https://form-copilot.onrender.com"]
         HealthRoute["/api/health<br/>Status & Key Verification"]
         LLMRoute["/api/llm<br/>Summary & Conversation Engine"]
         STTRoute["/api/stt<br/>Prisma Audio Transcription"]
@@ -365,7 +365,7 @@ npm --workspace=backend run build
 ```bash
 npm --workspace=backend run start
 ```
-*Server starts on `http://localhost:3001`.*
+*Server starts on `http://localhost:3001` (or use the deployed production backend at `https://form-copilot.onrender.com`).*
 
 ### 5. Load in Chrome
 

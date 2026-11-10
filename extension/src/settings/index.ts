@@ -1,7 +1,7 @@
 // extension/src/settings/index.ts: Settings management and backend health verification
 
 const STORAGE_KEY_BACKEND_URL = 'form_copilot_backend_url';
-export const DEFAULT_BACKEND_URL = 'http://localhost:3001';
+export const DEFAULT_BACKEND_URL = 'https://form-copilot.onrender.com';
 
 export interface BackendHealthResponse {
   status: string;

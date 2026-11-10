@@ -10,6 +10,7 @@ export default defineManifest({
   permissions: ['storage', 'sidePanel'],
   host_permissions: [
     'https://docs.google.com/forms/*',
+    'https://form-copilot.onrender.com/*',
     'http://localhost:3001/*',
     'http://127.0.0.1:3001/*',
   ],

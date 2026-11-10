@@ -68,7 +68,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ currentUrl, onClos
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="http://localhost:3001"
+                placeholder="https://form-copilot.onrender.com"
                 className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-mono text-[11px] bg-white"
                 required
               />
