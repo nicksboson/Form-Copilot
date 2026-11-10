@@ -4,8 +4,10 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js"
+    "build": "npm --prefix ../shared run build && tsc",
+    "start": "node dist/server.js",
+    "backend:build": "npm --prefix ../shared run build && tsc",
+    "backend:start": "node dist/server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
